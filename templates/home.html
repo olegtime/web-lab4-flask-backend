@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="main-form">
+        <form id="shoot-form">
+            {{ form.hidden_tag() }}
+
+            <input type="hidden" name="x" value="{{ form.x.data }}">
+
+            {{ form.x.label }}
+            {% for i in range(-6, 7) %}
+                <button type="button" class="x-button {% if form.x.data == (i * 0.5)|string %}active{% endif %}" data-value="{{i * 0.5}}">{{i * 0.5}}</button>
+            {% endfor %}<br>
+
+            {% if form.x.errors %}
+                <ul class="errors">
+                    {% for error in form.x.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {{ form.y.label }} {{ form.y(size=20) }}<br>
+
+            {% if form.y.errors %}
+                <ul class="errors">
+                    {% for error in form.y.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {{ form.r.label }}
+            {% for subfield in form.r %}
+                <label class="r-label">
+                    {{ subfield(class="form-check-input") }}
+                    {{ subfield.label.text }}
+                </label>
+            {% endfor %}<br>
+
+            {{ form.submit() }}
+        </form>
+
+        <form method="POST" action="{{ url_for('logout') }}">
+            <button type="submit" name="logout">Logout</button>
+        </form>
+
+        <form id="clear-button">
+            <button type="submit" name="clear">Clear</button>
+        </form>
+    </div>
+
+    <div class="chart">
+        <canvas id="canvas" width="600" height="600"></canvas>
+    </div>
+
+    <script src="{{ url_for('static', filename='scripts/setActiveButton.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/shoot.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/canvas.js') }}"></script>
+    <script>const att = ({{ attempts|tojson }}).concat(points.map(obj => [obj.x, obj.y, obj.r, obj.hit]));</script>
+    <script src="{{ url_for('static', filename='scripts/changeR.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/asyncShoot.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/asyncClear.js') }}"></script>
+{% endblock %}
+
+{% block table %}
+    <div class="table">
+        <table class="attempts-table">
+            <thead>
+                <tr>
+                    <th>X</th>
+                    <th>Y</th>
+                    <th>R</th>
+                    <th>Hit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attempt in attempts %}
+                    <tr>
+                        <td>{{ attempt[0] }}</td>
+                        <td>{{ attempt[1] }}</td>
+                        <td>{{ attempt[2] }}</td>
+                        <td>{{ attempt[3] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
